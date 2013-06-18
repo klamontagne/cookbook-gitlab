@@ -12,6 +12,11 @@ server {
   server_name <%= "git.demarque.com" %>;     # e.g., server_name source.example.com;
   server_tokens off;     # don't show the version number, a security best practice
   root <%= @gitlab_app_home %>/public;
+  <% if @https_boolean %>
+  ssl on;
+  ssl_certificate <%= @ssl_certificate %>;
+  ssl_certificate_key <%= @ssl_certificate_key %>;
+  <% end %>
 
   # individual nginx logs for this gitlab vhost
   access_log  /var/log/nginx/gitlab_access.log;
