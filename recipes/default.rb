@@ -140,18 +140,6 @@ template "#{node['gitlab']['home']}/.ssh/id_rsa.pub" do
   not_if { File.exists?("#{node['gitlab']['home']}/.ssh/id_rsa.pub") }
 end
 
-# Render public key template for gitolite user
-template "#{node['gitlab']['git_home']}/gitlab.pub" do
-  source "id_rsa.pub.erb"
-  owner node['gitlab']['git_user']
-  group node['gitlab']['git_group']
-  mode 0644
-  variables(
-    :public_key => node['gitlab']['public_key']
-  )
-  not_if { File.exists?("#{node['gitlab']['git_home']}/gitlab.pub") }
-end
-
 # Configure gitlab user to auto-accept localhost SSH keys
 template "#{node['gitlab']['home']}/.ssh/config" do
   source "ssh_config.erb"
@@ -214,6 +202,25 @@ execute "gitlab-bundle-install" do
   environment({ 'LANG' => "en_US.UTF-8", 'LC_ALL' => "en_US.UTF-8" })
   not_if { File.exists?("#{node['gitlab']['app_home']}/vendor/bundle") }
 end
+
+# Create tmp dirs
+execute "gitlab-create-tmp" do
+  command "bundle exec rake tmp:create"
+  environment ({'RAILS_ENV' => 'production'})
+  cwd node['gitlab']['app_home']
+  user node['gitlab']['user']
+  group node['gitlab']['group']
+  not_if { File.directory?("#{node['gitlab']['app_home']}/tmp/sockets") and File.directory?("#{node['gitlab']['app_home']}/tmp/pids") }
+end
+
+# Create the uploads directory
+directory "#{node['gitlab']['app_home']}/public/uploads" do
+  owner node['gitlab']['user']
+  group node['gitlab']['group']
+  mode 00755
+  action :create
+end
+
 # Setup the database
 case node['gitlab']['database']['type']
 when 'mysql'
@@ -249,10 +256,10 @@ template "#{node['gitlab']['app_home']}/config/database.yml" do
   )
 end
 
-
-# Setup sqlite database for Gitlab
-execute "gitlab-bundle-rake" do
-  command "bundle exec rake gitlab:app:setup RAILS_ENV=production && touch .gitlab-setup"
+# Setup database for Gitlab
+bash "gitlab-bundle-rake" do
+  command "bundle exec rake gitlab:setup <<< yes yes && touch .gitlab-setup"
+  environment ({'RAILS_ENV' => 'production'})
   cwd node['gitlab']['app_home']
   user node['gitlab']['user']
   group node['gitlab']['group']

@@ -18,14 +18,17 @@
 # limitations under the License.
 
 # Set attributes for the git user
-default['gitlab']['user'] = "gitlab"
-default['gitlab']['group'] = "gitlab"
-default['gitlab']['home'] = "/var/gitlab"
+default['gitlab']['user'] = "git"
+default['gitlab']['group'] = "git"
+default['gitlab']['home'] = "/home/git"
 default['gitlab']['app_home'] = "#{node['gitlab']['home']}/gitlab"
 
 # Set github URL for gitlab
 default['gitlab']['gitlab_url'] = "git://github.com/gitlabhq/gitlabhq.git"
-default['gitlab']['gitlab_branch'] = "stable"
+default['gitlab']['gitlab_branch'] = "5-2-stable"
+
+# hostname used for gitlab-shell
+default['gitlab']['gitlab_api_url'] = "https://localhost/"
 
 # Database setup
 default['gitlab']['database']['type'] = "mysql"
@@ -85,7 +88,7 @@ default['gitlab']['ssl_certificate'] = "/etc/nginx/#{node['fqdn']}.crt"
 default['gitlab']['ssl_certificate_key'] = "/etc/nginx/#{node['fqdn']}.key"
 default['gitlab']['ssl_req'] = "/C=US/ST=Several/L=Locality/O=Example/OU=Operations/CN=#{node['fqdn']}/emailAddress=root@localhost"
 
-default['gitlab']['backup_path'] = node['gitlab']['app_home'] + "/backups"
+default['gitlab']['backup_path'] = "tmp/backups"
 default['gitlab']['backup_keep_time'] = 604800
 
 # workers for puma "cluster mode", see config/puma.rb
