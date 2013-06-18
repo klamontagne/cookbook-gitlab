@@ -1,4 +1,4 @@
-# <a name="title"></a> cookbook-gitlab [![Build Status](https://secure.travis-ci.org/atomic-penguin/cookbook-gitlab.png?branch=master)](http://travis-ci.org/atomic-penguin/cookbook-gitlab)
+# <a name="title"></a> cookbook-gitlab [![Build Status](https://secure.travis-ci.org/klamontagne/cookbook-gitlab5.png?branch=master)](http://travis-ci.org/atomic-penguin/cookbook-gitlab)
 
 ## Description
 
