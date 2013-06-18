@@ -197,6 +197,9 @@ Copyright: 2012
 Author: Eric G. Wolfe
 Copyright: 2012
 
+Author: K. Lamontagne
+Copyright: 2013
+
 Gitlolite Author: David Ruan
 Copyright: RailsAnt, Inc., 2010
 
