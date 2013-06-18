@@ -64,3 +64,14 @@ template "#{node['gitlab']['git_home']}/gitlab-shell/config.yml" do
   group node['gitlab']['git_group']
   mode 0644
 end
+
+# gitlab-shell program needs a patch for rbenv (shebang)
+template "#{node['gitlab']['git_home']}/gitlab-shell/bin/gitlab-shell" do
+  source "gitlab-shell-program.erb"
+  owner node['gitlab']['git_user']
+  group node['gitlab']['git_group']
+  mode 0755
+  variables(
+    :git_home => node['gitlab']['git_home']
+  )
+end
