@@ -7,17 +7,14 @@ application.
 
 Code hosted on github [here](https://github.com/gitlabhq/gitlabhq/tree/stable).
 
-This cookbook was developed on RHEL/CentOS 6.  Other platforms may need re-worked,
-please open an issue or send a pull request to either, atomic-penguin or jackl0phty, on github.
+This cookbook was developed on Ubuntu 12.04.  Other platforms may need some tweaks,
+please open an issue or send a pull request on GitHub
 
 ## Requirements
 ============
 
 * Hard disk space
-  - About 200 Mb, plus enough space for repositories on /var
-
-* Ruby 1.9.1 packages
-  - Packages used for Debian / Ubuntu only
+  - About 200 Mb, plus enough space for repositories on /home/git
 
 * Nginx package
   - All platforms need an nginx package to configure Nginx and Unicorn.
@@ -28,7 +25,7 @@ The dependencies in this cookbook add up to over 1,500 lines of code.
 This would not have been possible without the great community work of so many others.
 Much kudos to everyone who added indirectly to the epicness of this cookbook.
 
-* [ruby\_build](http://fnichol.github.com/chef-ruby_build/)
+* [ruby\_build](http://fnichol.github.com/chef-ruby_build/) and [rbenv](https://github.com/fnichol/chef-rbenv)
   - Thanks to Fletcher Nichol for his awesome ruby\_build cookbook.
     This ruby\_build LWRP is used to build Ruby 1.9.2 for gitlab,
     since Redhat shipped rubies are not compatible with the application.
@@ -63,50 +60,39 @@ Much kudos to everyone who added indirectly to the epicness of this cookbook.
 
 ## Notes about conflicts
 
-* [gitolite](http://ckbk.it/gitolite) cookbook
-  - The gitolite recipe within our cookbook was based on David Ruan's cookbook.
-    We couldn't integrate gitolite and gitlab without significant rework on David's
-    original cookbook.  Our gitolite recipe will only configure gitolite for use with gitlab.
-    Our gitlab::gitolite recipe will not set up a standalone gitolite installation as David's
-    cookbook does.
-
 * [nginx](http://ckbk.it/nginx) cookbook
-  - Our default recipe templates out the /etc/nginx/conf.d/default.conf.  This will directly
-    conflict with another cookbook, such as nginx, trying to manage this file.
+  - Our default recipe templates out the /etc/nginx/conf.d/default.conf or /etc/nginx/sites-available/default.  This will directly
+    conflict with another cookbook, such as nginx, or APT package management, trying to manage this file.
 
 ## Attributes
 
-* gitlab['gitolite\_url']
-  - Github gitolite address
-  - Default git://github.com/sitaramc/gitolite.git
+* gitlab['gitlab-shell\_url']
+  - Github gitlab-shell address
+  - Default https://github.com/gitlabhq/gitlab-shell.git
 
 * gitlab['git\_user'] & gitlab['git\_group']
-  - Git service account for gitolite
+  - Git service account for GitLab
   - Default git
 
 * gitlab['git\_home']
-  - Top-level home for gitolite and repositories
-  - Default /var/git
+  - Top-level home for GitLab, gitlab-shell and repositories
+  - Default /home/git
 
-* gitlab['gitolite\_home']
-  - Application home for gitolite
-  - Default /var/git/gitolite
-
-* gitlab['gitolite\_umask']
-  - Umask setting for gitolite.rc
-  - Defaults to 0007
+* gitlab['gitlab-shell\_home']
+  - Application home for gitlab-shell
+  - Default /home/git/gitlab-shell
 
 * gitlab['user'] & gitlab['group']
-  - Gitlab service user and group for Unicorn Rails app
-  - Default gitlab
+  - Gitlab service user and group for Puma Rails app
+  - Default git
 
 * gitlab['home']
   - Gitlab top-level home for service account
-  - default /var/gitlab
+  - default /home/git
 
 * gitlab['app\_home']
   - Gitlab application home
-  - Default /var/gitlab/gitlab
+  - Default /home/git/gitlab
 
 * gitlab['gitlab\_url']
   - Github gitlab address
@@ -114,7 +100,7 @@ Much kudos to everyone who added indirectly to the epicness of this cookbook.
 
 * gitlab['gitlab\_branch']
   - Gitlab git branch
-  - Default master
+  - Default 5-2-stable
 
 * gitlab['packages']
   - Platform specific OS packages
@@ -124,9 +110,8 @@ Much kudos to everyone who added indirectly to the epicness of this cookbook.
   - Defaults to yes
 
 * gitlab['install\_ruby']
-  - Attribute to determine whether vendor packages are installed,
-    or Rubies are built
-  - Redhat family defaults 1.9.2; Debian family defaults to package.
+  - Attribute to determine ruby version installed by rbenv
+  - Default 1.9.3-p429
 
 * gitlab['https']
   - Whether https should be used
@@ -147,6 +132,11 @@ Much kudos to everyone who added indirectly to the epicness of this cookbook.
 * gitlab['backup\_keep\_time']
   - In seconds. Older backups will automatically be deleted when new backup is created. Set to 0 to keep backups forever.
   - Defaults to 604800
+
+* gitlab['puma_workers']
+  - Number of puma workers for clustering mode (see puma.rb)
+  - Defaults to 0 (disabled)
+
 
 ### Database Attributes
 
