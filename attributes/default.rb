@@ -36,6 +36,14 @@ default['gitlab']['database']['pool'] = 5
 default['gitlab']['database']['database'] = "gitlab"
 default['gitlab']['database']['username'] = "gitlab"
 
+# nginx vhost file path
+case node['platform']
+when "ubuntu","debian"
+  default['gitlab']['nginx_vhost'] = "/etc/nginx/sites-available/default"
+else  # "redhat","centos","amazon","scientific" ## other?
+  default['gitlab']['nginx_vhost'] = "/etc/nginx/conf.d/default.conf"
+end
+
 # Required packages for Gitlab
 case node['platform']
 when "ubuntu","debian"
