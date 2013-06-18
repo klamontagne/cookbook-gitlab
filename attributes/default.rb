@@ -28,7 +28,7 @@ default['gitlab']['gitlab_url'] = "git://github.com/gitlabhq/gitlabhq.git"
 default['gitlab']['gitlab_branch'] = "5-2-stable"
 
 # hostname used for gitlab-shell
-default['gitlab']['gitlab_api_url'] = "https://localhost/"
+default['gitlab']['gitlab_api_url'] = "http://localhost/"
 
 # Database setup
 default['gitlab']['database']['type'] = "mysql"
