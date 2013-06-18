@@ -35,26 +35,6 @@ link "/usr/bin/redis-cli" do
   to "/usr/local/bin/redis-cli"
 end
 
-# There are problems deploying on Redhat provided rubies.
-# We'll use Fletcher Nichol's slick ruby_build cookbook to compile a Ruby.
-if node['gitlab']['install_ruby'] !~ /package/
-  ruby_build_ruby node['gitlab']['install_ruby']
-
-  # Drop off a profile script.
-  template "/etc/profile.d/gitlab.sh" do
-    owner "root"
-    group "root"
-    mode 0755
-    variables(
-      :fqdn => node['fqdn'],
-      :install_ruby => node['gitlab']['install_ruby']
-    )
-  end
-
-  # Set PATH for remainder of recipe.
-  ENV['PATH'] = "/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin:/usr/local/ruby/#{node['gitlab']['install_ruby']}/bin"
-end
-
 # Install required packages for Gitlab
 node['gitlab']['packages'].each do |pkg|
   package pkg
@@ -65,12 +45,6 @@ chef_gem "sshkey" do
   action :install
 end
 
-# Install required Ruby Gems for Gitlab
-%w{ charlock_holmes bundler }.each do |gempkg|
-  gem_package gempkg do
-    action :install
-  end
-end
 
 # Install pygments from pip
 python_pip "pygments" do
@@ -95,6 +69,31 @@ end
 # Add the gitlab user to the "git" group
 group node['gitlab']['git_group'] do
   members node['gitlab']['user']
+end
+
+# setup rbenv (after git user setup)
+%w{ ruby_build rbenv::user_install }.each do |requirement|
+  include_recipe requirement
+end
+
+# Install appropriate Ruby with rbenv
+rbenv_ruby node['gitlab']['install_ruby'] do
+  action :install
+  user node['gitlab']['user']
+end
+
+# Set as the rbenv default ruby
+rbenv_global node['gitlab']['install_ruby'] do
+  user node['gitlab']['user']
+end
+
+# Install required Ruby Gems for Gitlab (via rbenv)
+%w{ charlock_holmes bundler }.each do |gempkg|
+  rbenv_gem gempkg do
+    action :install
+    user node['gitlab']['user']
+    rbenv_version node['gitlab']['install_ruby']
+  end
 end
 
 # Create a $HOME/.ssh folder
@@ -204,6 +203,17 @@ template "#{node['gitlab']['app_home']}/config/gitlab.yml" do
   )
 end
 
+without_group = node['gitlab']['database']['type'] == 'mysql' ? 'postgres' : 'mysql'
+
+# Install Gems with bundle install
+execute "gitlab-bundle-install" do
+  command "bundle install --without development test #{without_group} --deployment"
+  cwd node['gitlab']['app_home']
+  user node['gitlab']['user']
+  group node['gitlab']['group']
+  environment({ 'LANG' => "en_US.UTF-8", 'LC_ALL' => "en_US.UTF-8" })
+  not_if { File.exists?("#{node['gitlab']['app_home']}/vendor/bundle") }
+end
 # Setup the database
 case node['gitlab']['database']['type']
 when 'mysql'
@@ -239,17 +249,6 @@ template "#{node['gitlab']['app_home']}/config/database.yml" do
   )
 end
 
-without_group = node['gitlab']['database'] == 'mysql' ? 'postgres' : 'mysql'
-
-# Install Gems with bundle install
-execute "gitlab-bundle-install" do
-  command "bundle install --without development test #{without_group} --deployment"
-  cwd node['gitlab']['app_home']
-  user node['gitlab']['user']
-  group node['gitlab']['group']
-  environment({ 'LANG' => "en_US.UTF-8", 'LC_ALL' => "en_US.UTF-8" })
-  not_if { File.exists?("#{node['gitlab']['app_home']}/vendor/bundle") }
-end
 
 # Setup sqlite database for Gitlab
 execute "gitlab-bundle-rake" do

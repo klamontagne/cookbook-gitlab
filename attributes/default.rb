@@ -40,7 +40,6 @@ default['gitlab']['database']['username'] = "gitlab"
 case node['platform']
 when "ubuntu","debian"
   default['gitlab']['packages'] = %w{
-    ruby1.9.1 ruby1.9.1-dev ri1.9.1 libruby1.9.1
     curl wget checkinstall libxslt-dev libsqlite3-dev
     libcurl4-openssl-dev libssl-dev libmysql++-dev
     libicu-dev libc6-dev libyaml-dev nginx python python-dev
@@ -62,7 +61,6 @@ when "redhat","centos","amazon","scientific"
   end
 else
   default['gitlab']['packages'] = %w{
-    ruby1.9.1 ruby1.9.1-dev ri1.9.1 libruby1.9.1
     curl wget checkinstall libxslt-dev libsqlite3-dev
     libcurl4-openssl-dev libssl-dev libmysql++-dev
     libicu-dev libc6-dev libyaml-dev nginx python
@@ -72,13 +70,7 @@ end
 
 default['gitlab']['trust_local_sshkeys'] = "yes"
 
-# Problems deploying this on RedHat provided rubies.
-case node['platform']
-when "redhat","centos","scientific","amazon"
-  default['gitlab']['install_ruby'] = "1.9.2-p290"
-else
-  default['gitlab']['install_ruby'] = "package"
-end
+default['gitlab']['install_ruby'] = "1.9.3-p429"
 
 default['gitlab']['https'] = false
 default['gitlab']['ssl_certificate'] = "/etc/nginx/#{node['fqdn']}.crt"
@@ -90,3 +82,8 @@ default['gitlab']['backup_keep_time'] = 604800
 
 # workers for puma "cluster mode", see config/puma.rb
 default['gitlab']['puma_wokers'] = 0
+
+# rbenv
+node.default['rbenv']['user_installs'] = [
+  { 'user' => default['gitlab']['user'] }
+]
