@@ -19,7 +19,7 @@
 #
 
 # Include cookbook dependencies
-%w{ ruby_build gitlab::gitolite build-essential
+%w{ build-essential gitlab::gitlab-shell
     readline sudo openssh xml zlib python::package python::pip
     redisio::install redisio::enable }.each do |requirement|
   include_recipe requirement
@@ -165,11 +165,9 @@ template "#{node['gitlab']['home']}/.ssh/config" do
   )
 end
 
-# Sorry for this ugliness.
-# It seems maybe something is wrong with the 'gitolite setup' script.
-# This was implemented as a workaround.
-execute "install-gitlab-key" do
-  command "su - #{node['gitlab']['git_user']} -c 'perl #{node['gitlab']['gitolite_home']}/src/gitolite setup -pk #{node['gitlab']['git_home']}/gitlab.pub'"
+# Setup gitlab-shell
+execute "setup-gitlab-shell" do
+  command "su - #{node['gitlab']['git_user']} -c 'cd gitlab-shell && ./bin/install'"
   user "root"
   cwd node['gitlab']['git_home']
   not_if "grep -q '#{node['gitlab']['user']}' #{node['gitlab']['git_home']}/.ssh/authorized_keys"
