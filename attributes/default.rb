@@ -87,3 +87,6 @@ default['gitlab']['ssl_req'] = "/C=US/ST=Several/L=Locality/O=Example/OU=Operati
 
 default['gitlab']['backup_path'] = node['gitlab']['app_home'] + "/backups"
 default['gitlab']['backup_keep_time'] = 604800
+
+# workers for puma "cluster mode", see config/puma.rb
+default['gitlab']['puma_wokers'] = 0

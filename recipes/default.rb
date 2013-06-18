@@ -260,31 +260,32 @@ execute "gitlab-bundle-rake" do
   not_if { File.exists?("#{node['gitlab']['app_home']}/.gitlab-setup") }
 end
 
-# Render unicorn template
-template "#{node['gitlab']['app_home']}/config/unicorn.rb" do
+# Render puma template
+template "#{node['gitlab']['app_home']}/config/puma.rb" do
   owner node['gitlab']['user']
   group node['gitlab']['group']
   mode 0644
   variables(
-    :fqdn => node['fqdn'],
-    :gitlab_app_home => node['gitlab']['app_home']
+    :gitlab_app_home => node['gitlab']['app_home'],
+    :workers => node['gitlab']['puma_wokers']
   )
 end
 
-# Render unicorn_rails init script
-template "/etc/init.d/unicorn_rails" do
+# Render GitLab (puma) init script
+template "/etc/init.d/gitlab" do
   owner "root"
   group "root"
   mode 0755
-  source "unicorn_rails.init.erb"
+  source "gitlab.init.erb"
   variables(
     :fqdn => node['fqdn'],
+    :user => node['gitlab']['git_user'],
     :gitlab_app_home => node['gitlab']['app_home']
   )
 end
 
 # Start unicorn_rails and nginx service
-%w{ unicorn_rails nginx }.each do |svc|
+%w{ gitlab nginx }.each do |svc|
   service svc do
     action [ :start, :enable ]
   end
