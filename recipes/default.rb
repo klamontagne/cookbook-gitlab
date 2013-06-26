@@ -257,9 +257,9 @@ template "#{node['gitlab']['app_home']}/config/database.yml" do
 end
 
 # Setup database for Gitlab
-bash "gitlab-bundle-rake" do
+execute "gitlab-bundle-rake" do
   command "bundle exec rake gitlab:setup && touch .gitlab-setup"
-  environment ({'RAILS_ENV' => 'production', 'FORCE' => 'yes'})
+  environment ({'RAILS_ENV' => 'production', 'force' => 'yes'})
   cwd node['gitlab']['app_home']
   user node['gitlab']['user']
   group node['gitlab']['group']
