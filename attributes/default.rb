@@ -27,9 +27,6 @@ default['gitlab']['app_home'] = "#{node['gitlab']['home']}/gitlab"
 default['gitlab']['gitlab_url'] = "git://github.com/gitlabhq/gitlabhq.git"
 default['gitlab']['gitlab_branch'] = "5-2-stable"
 
-# hostname used for gitlab-shell
-default['gitlab']['gitlab_api_url'] = "http://localhost/"
-
 # Database setup
 default['gitlab']['database']['type'] = "mysql"
 default['gitlab']['database']['adapter'] = default['gitlab']['database']['type'] == "mysql" ? "mysql2" : "postgresql"
@@ -84,9 +81,13 @@ default['gitlab']['trust_local_sshkeys'] = "yes"
 default['gitlab']['install_ruby'] = "1.9.3-p429"
 
 default['gitlab']['https'] = false
+# hostname used for gitlab-shell. Set as https if you set the above to true
+default['gitlab']['gitlab_api_url'] = "http://localhost/"
+
 default['gitlab']['ssl_certificate'] = "/etc/nginx/#{node['fqdn']}.crt"
 default['gitlab']['ssl_certificate_key'] = "/etc/nginx/#{node['fqdn']}.key"
 default['gitlab']['ssl_req'] = "/C=US/ST=Several/L=Locality/O=Example/OU=Operations/CN=#{node['fqdn']}/emailAddress=root@localhost"
+
 
 default['gitlab']['backup_path'] = "tmp/backups"
 default['gitlab']['backup_keep_time'] = 604800
