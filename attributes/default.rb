@@ -98,3 +98,17 @@ default['gitlab']['puma_wokers'] = 0
 node.default['rbenv']['user_installs'] = [
   { 'user' => default['gitlab']['user'] }
 ]
+
+# Google oauth2
+default['gitlab']['omniauth']['enable_omniauth'] = false
+default['gitlab']['omniauth']['allow_single_sign_on'] = false
+default['gitlab']['omniauth']['block_auto_created_users'] = true
+default['gitlab']['omniauth']['providers'] = {}
+#example
+#default['gitlab']['omniauth']['providers'] = [ { :name => "google_oauth2", 
+#                                     :app_id => "xyz.apps.googleusercontent.com",
+#                                     :app_secret => "abcd" } ]
+
+
+
+

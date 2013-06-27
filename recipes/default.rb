@@ -187,7 +187,11 @@ template "#{node['gitlab']['app_home']}/config/gitlab.yml" do
     :git_user => node['gitlab']['git_user'],
     :git_home => node['gitlab']['git_home'],
     :backup_path => node['gitlab']['backup_path'],
-    :backup_keep_time => node['gitlab']['backup_keep_time']
+    :backup_keep_time => node['gitlab']['backup_keep_time'],
+    :enable_omniauth => node['gitlab']['omniauth']['enable_omniauth'],
+    :allow_single_sign_on => node['gitlab']['omniauth']['allow_single_sign_on'],
+    :block_auto_created_users => node['gitlab']['omniauth']['block_auto_created_users'],
+    :providers => node['gitlab']['omniauth']['providers']
   )
 end
 
