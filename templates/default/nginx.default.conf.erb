@@ -7,7 +7,7 @@ upstream gitlab {
 }
 
 server {
-  listen *:80 default_server;         # e.g., listen 192.168.1.1:80; In most cases *:80 is a good idea
+  listen *:<%= @port %> default_server;         # e.g., listen 192.168.1.1:80; In most cases *:80 is a good idea
 #  server_name <%= @fqdn %>;     # e.g., server_name source.example.com;
   server_name <%= "git.demarque.com" %>;     # e.g., server_name source.example.com;
   server_tokens off;     # don't show the version number, a security best practice

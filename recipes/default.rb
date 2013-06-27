@@ -326,6 +326,7 @@ template node['gitlab']['nginx_vhost'] do #TODO remove default && install gitlab
     :fqdn => node['fqdn'],
     :gitlab_app_home => node['gitlab']['app_home'],
     :https_boolean => node['gitlab']['https'],
+    :port => (node['gitlab']['https'] ? 443 : 80),
     :ssl_certificate => node['gitlab']['ssl_certificate'],
     :ssl_certificate_key => node['gitlab']['ssl_certificate_key']
   )
