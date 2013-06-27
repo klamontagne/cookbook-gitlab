@@ -137,6 +137,12 @@ Much kudos to everyone who added indirectly to the epicness of this cookbook.
   - Number of puma workers for clustering mode (see puma.rb)
   - Defaults to 0 (disabled)
 
+* gitlab['omniauth']['enable_omniauth'], gitlab['omniauth']['allow_single_sign_on'], gitlab['omniauth']['block_auto_created_users']
+  - Omniauth support variables (see gitlab.yml)
+  - Defaults disable Omniauth
+* gitlab['omniauth']['providers']
+  - Array of providers for omniauth (Google, Twitter, GitHub), you need to install the appropriate gem (as the git user) for others.
+  - Example:  [ { :name => "google_oauth2", :app_id => "xyz.apps.googleusercontent.com", :app_secret => "abcd" } ]
 
 ### Database Attributes
 
