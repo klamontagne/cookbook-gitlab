@@ -164,7 +164,17 @@ end
 git node['gitlab']['app_home'] do
   repository node['gitlab']['gitlab_url']
   reference node['gitlab']['gitlab_branch']
-  action :checkout
+  action :sync
+  notifies :run, "execute[db-migrate]", :immediate
+  user node['gitlab']['user']
+  group node['gitlab']['group']
+end
+
+execute "db-migrate" do
+  action :nothing
+  command "/usr/sbin/service gitlab stop; sleep 10s; bundle exec rake db:migrate"
+  cwd node['gitlab']['app_home']
+  environment ({"RAILS_ENV"=>"production"})
   user node['gitlab']['user']
   group node['gitlab']['group']
 end
