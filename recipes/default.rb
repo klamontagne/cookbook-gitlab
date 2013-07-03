@@ -18,6 +18,7 @@
 # limitations under the License.
 #
 
+node.set['build_essential']['compiletime'] = true
 # Include cookbook dependencies
 %w{ build-essential gitlab::gitlab-shell
     readline sudo openssh xml zlib python::package python::pip
@@ -166,13 +167,23 @@ git node['gitlab']['app_home'] do
   reference node['gitlab']['gitlab_branch']
   action :sync
   notifies :run, "execute[db-migrate]", :immediate
+  notifies :run, "execute[assets-compile]", :immediate
   user node['gitlab']['user']
   group node['gitlab']['group']
 end
 
 execute "db-migrate" do
   action :nothing
-  command "/usr/sbin/service gitlab stop; sleep 10s; bundle exec rake db:migrate"
+  command "bundle exec rake db:migrate"
+  cwd node['gitlab']['app_home']
+  environment ({"RAILS_ENV"=>"production"})
+  user node['gitlab']['user']
+  group node['gitlab']['group']
+end
+
+execute "assets-compile" do
+  action :run
+  command "bundle exec rake assets:clean; bundle exec rake assets:precompile"
   cwd node['gitlab']['app_home']
   environment ({"RAILS_ENV"=>"production"})
   user node['gitlab']['user']
