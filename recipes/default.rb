@@ -166,8 +166,8 @@ git node['gitlab']['app_home'] do
   repository node['gitlab']['gitlab_url']
   reference node['gitlab']['gitlab_branch']
   action :sync
-  notifies :run, "execute[db-migrate]", :immediate
-  notifies :run, "execute[assets-compile]", :immediate
+  notifies :run, "execute[db-migrate]", :delayed
+  notifies :run, "execute[assets-compile]", :delayed
   user node['gitlab']['user']
   group node['gitlab']['group']
 end
@@ -182,7 +182,7 @@ execute "db-migrate" do
 end
 
 execute "assets-compile" do
-  action :run
+  action :nothing
   command "bundle exec rake assets:clean; bundle exec rake assets:precompile"
   cwd node['gitlab']['app_home']
   environment ({"RAILS_ENV"=>"production"})
