@@ -246,6 +246,14 @@ directory "#{node['gitlab']['app_home']}/public/uploads" do
   action :create
 end
 
+# Create the gitlab-satellites
+directory "gitlab-satellites" do
+  owner node['gitlab']['user']
+  group node['gitlab']['group']
+  mode 00750
+  action :create
+end
+
 # Setup the database
 case node['gitlab']['database']['type']
 when 'mysql'
